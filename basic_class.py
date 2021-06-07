@@ -8,7 +8,7 @@ class table():
         self.attributes = attributes
 
 class column():
-    def __init__(self, name, is_unique, d_type, length):
+    def __init__(self, name, is_unique, d_type = 'char', length = 20):
         # column_name
         # is_unique = true or false
         # data_type = 'int', 'float', 'char(n)'
@@ -20,7 +20,9 @@ class column():
 
 
 
-
+def test():
+    # for testing this module
+    pass
 
 if __name__ == "__main__":
-    pass
+    test()
