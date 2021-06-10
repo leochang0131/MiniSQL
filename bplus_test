@@ -1,0 +1,119 @@
+[1mINSERT [0mKEY: 53, VAL: hi0 
+
+[1mINSERT [0mKEY: 38, VAL: hi1 
+
+[1mINSERT [0mKEY: 50, VAL: hi2 
+
+[1mINSERT [0mKEY: 18, VAL: hi3 
+
+[1mINSERT [0mKEY: 60, VAL: hi4 
+
+[1mnewroot: [0m ['50']              
+[1mINSERT [0mKEY: 2, VAL: hi5 
+
+[1mINSERT [0mKEY: 63, VAL: hi6 
+
+[1mINSERT [0mKEY: 15, VAL: hi7 
+
+[1mINSERT [0mKEY: 63, VAL: hi8 
+
+key already exists
+[1mINSERT [0mKEY: 40, VAL: hi9 
+
+[1mINSERT [0mKEY: 82, VAL: hi10 
+
+[1mINSERT [0mKEY: 20, VAL: hi11 
+
+[1mINSERT [0mKEY: 5, VAL: hi12 
+
+[1mINSERT [0mKEY: 25, VAL: hi13 
+
+[1mINSERT [0mKEY: 22, VAL: hi14 
+
+[1mINSERT [0mKEY: 75, VAL: hi15 
+
+[1mINSERT [0mKEY: 18, VAL: hi16 
+
+key already exists
+[1mINSERT [0mKEY: 2, VAL: hi17 
+
+key already exists
+[1mINSERT [0mKEY: 32, VAL: hi18 
+
+[1mINSERT [0mKEY: 84, VAL: hi19 
+
+[1mnewroot: [0m ['50']              
+[1mINSERT [0mKEY: 16, VAL: hi20 
+
+[1mINSERT [0mKEY: 94, VAL: hi21 
+
+[1mINSERT [0mKEY: 6, VAL: hi22 
+
+[1mINSERT [0mKEY: 84, VAL: hi23 
+
+key already exists
+[1mINSERT [0mKEY: 24, VAL: hi24 
+
+[1mINSERT [0mKEY: 55, VAL: hi25 
+
+[1mINSERT [0mKEY: 15, VAL: hi26 
+
+key already exists
+[1mINSERT [0mKEY: 89, VAL: hi27 
+
+[1mINSERT [0mKEY: 39, VAL: hi28 
+
+[1mINSERT [0mKEY: 7, VAL: hi29 
+
+[1mINSERT [0mKEY: 35, VAL: hi30 
+
+[1mINSERT [0mKEY: 26, VAL: hi31 
+
+[1mINSERT [0mKEY: 36, VAL: hi32 
+
+[1mINSERT [0mKEY: 25, VAL: hi33 
+
+key already exists
+[1mINSERT [0mKEY: 57, VAL: hi34 
+
+[1mINSERT [0mKEY: 86, VAL: hi35 
+
+[1mINSERT [0mKEY: 59, VAL: hi36 
+
+[1mINSERT [0mKEY: 60, VAL: hi37 
+
+key already exists
+[1mINSERT [0mKEY: 57, VAL: hi38 
+
+key already exists
+[1mINSERT [0mKEY: 19, VAL: hi39 
+
+[1mINSERT [0mKEY: 62, VAL: hi40 
+
+[1mINSERT [0mKEY: 70, VAL: hi41 
+
+[1mINSERT [0mKEY: 32, VAL: hi42 
+
+key already exists
+[1mINSERT [0mKEY: 5, VAL: hi43 
+
+key already exists
+[1mINSERT [0mKEY: 55, VAL: hi44 
+
+key already exists
+[1mINSERT [0mKEY: 80, VAL: hi45 
+
+[1mINSERT [0mKEY: 72, VAL: hi46 
+
+[1mINSERT [0mKEY: 48, VAL: hi47 
+
+[1mINSERT [0mKEY: 64, VAL: hi48 
+
+[1mINSERT [0mKEY: 79, VAL: hi49 
+
+INDEX NAME: test, DEPTH: 2
+0	{['25', '50', '63']    }
+1	{['06', '18', '20']    ['32', '38']          ['55', '60']          ['75', '84']          }
+2	{['2', '5']            ['06', '07', '15', '16']  ['18', '19']          ['20', '22', '24']    } {['25', '26']          ['32', '35', '36']    ['38', '39', '40', '48']  } {['50', '53']          ['55', '57', '59']    ['60', '62']          } {['63', '64', '70', '72']  ['75', '79', '80', '82']  ['84', '86', '89', '94']  }
+DONE 
+
