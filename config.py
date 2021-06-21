@@ -10,11 +10,16 @@ class bcolors:
     BOLD = '\033[1m'
 
 
+# Path
+root = "./data/"
+catalog_path = root + "catalog/"
+index_path = root + "index/"
+
 # System
 default_user = "ZLQ"
 default_pswd = "123456"
 
 # Index
-max_degree = 5  # max degree of bplus tree
+max_degree = 10  # max degree of bplus tree
 
 nodedis_w = 13 # the node width for bplus tree visualization

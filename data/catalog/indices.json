@@ -1,0 +1,6 @@
+{
+  "student_test": {
+    "table": "student",
+    "column": "primary"
+  }
+}

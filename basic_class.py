@@ -6,9 +6,12 @@ class table():
         self.name = name
         self.primary = primary
         self.attributes = attributes
+    
+    def __repr__(self):
+        return "table_name: {}\n attributes:{}\n primary:{}".format(self.name, self.attributes, self.primary)
 
 class column():
-    def __init__(self, name, is_unique, d_type = 'char', length = 20):
+    def __init__(self, name, is_unique, d_type = 'c', length = 20):
         # column_name
         # is_unique = true or false
         # data_type = 'int', 'float', 'char(n)'
@@ -18,6 +21,8 @@ class column():
         self.d_type = d_type
         self.length = length
 
+    def __repr__(self):
+        return " ({}, {}, {}, {}) ".format(self.name, self.is_unique, self.d_type, self.length)
 
 
 def test():

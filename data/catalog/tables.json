@@ -1,0 +1,27 @@
+{
+  "student": {
+    "pri_k": 0,
+    "columns": {
+      "sno": [
+        false,
+        "c",
+        8
+      ],
+      "sname": [
+        true,
+        "c",
+        16
+      ],
+      "sage": [
+        false,
+        "i",
+        0
+      ],
+      "sgender": [
+        false,
+        "c",
+        1
+      ]
+    }
+  }
+}
