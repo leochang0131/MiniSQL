@@ -78,8 +78,8 @@ def create(args):
         
         catalog_manager.exist_table(table, False)       # table should exist
         catalog_manager.exist_index(index_name, table, column, True)   # index should not be already created
-        index_manager.create_index(index_name, table)
         catalog_manager.create_index(index_name, table, column)
+        index_manager.create_index(index_name, table)
         print("Successfully create index '{}'".format(index_name))
 
     else:
@@ -104,10 +104,12 @@ def drop(args):
         
 
     elif args[0:5] == "index":
+        
         index_n = args[6:].strip()
+        # print(index_n)
         catalog_manager.exist_index(index_n, False)
+        index_manager.drop_index(index_n, catalog.indices[index_n]["table"])
         catalog_manager.drop_index(index_n)
-        index_manager.drop_index(index_n, catalog.indices[index_n]["tables"])
         print("Successfully delete index '{}'.".format(index_n))
 
     else:

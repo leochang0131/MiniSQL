@@ -45,7 +45,7 @@ class index_manager():
 
     def insert_rec(self, _table, _values):
         self.__load__(_table)
-
+        self.__load_i__(_table)
         for i, col in enumerate(cat_tables[_table].attributes):
             if col.d_type == 'i':
                 _values[i] = int(_values[i])
@@ -72,6 +72,7 @@ class index_manager():
     
     def delete_rec(self, _table, conditions=[]):
         self.__load__(_table)
+        self.__load_i__(_table)
 
         if len(conditions) == 0:
             ind_tables[_table] = bplustree(_table + "rec")
@@ -138,12 +139,12 @@ class index_manager():
 
 
     def __load_i__(self, t_name):
-    # load index
-    for _index in cat_indices.items():
-        if _index[1]["table"] == t_name:
-            ind_tree = bplustree("{}_{}".format(_index[0], t_name))
-            bplustree.__load__("{}_{}".format(_index[0], t_name), ind_tree)
-            ind_tables[_index[0]] = ind_tree
+        # load index
+        for _index in cat_indices.items():
+            if _index[1]["table"] == t_name:
+                ind_tree = bplustree("{}_{}".format(_index[0], t_name))
+                bplustree.__load__("{}_{}".format(_index[0], t_name), ind_tree)
+                ind_tables[_index[0]] = ind_tree
 
     def __load__(self, t_name):
         if t_name not in ind_tables.keys():

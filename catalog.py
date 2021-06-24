@@ -176,7 +176,7 @@ class catalog_manager():
 
             for ind in indices.values():
                 if col_i == ind["column"] and t_name == ind["table"]:
-                    raise ValueError("Catalog Module : duplicate create, index {} already exists".format(ind[0]))
+                    raise ValueError("Catalog Module : duplicate create, index {} already exists".format(ind))
                 
         if _index in indices.keys() and t:
             raise ValueError("Catalog Module : index {} already exists".format(_index))

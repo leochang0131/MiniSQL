@@ -37,6 +37,7 @@ class miniSQL(cmd.Cmd):
             print(time_prompt, api.drop(args.replace(';','')))
         except Exception as e:
             print(str(e))
+        # api.drop(args.replace(';',''))
 
     def do_insert(self,args):
         try:
