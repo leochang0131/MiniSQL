@@ -8,6 +8,6 @@ table = "student"
 INSERT_PREFIX = "insert into {} values ".format(table)
 
 with open("insert.test", "w") as f:
-    for i in range(20000):
+    for i in range(20):
         values = "({}, s{}, {}, {});\n".format(i, i, random.randint(10, 20), 'M' if i % 2 == 0 else 'F')
         f.writelines(INSERT_PREFIX + values)

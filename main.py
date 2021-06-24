@@ -12,8 +12,11 @@ class miniSQL(cmd.Cmd):
     global time_prompt
     intro = 'Welcome to the MiniSQL database server.\nType help or ? to list commands.\n'
 
-    def do_show(self, args):
+    def do_show_t(self, args):
         api.show_tables()
+
+    def do_show_i(self, args):
+        api.show_indices()
 
     def do_select(self,args):
         # api.select(args.replace(';', ''))
@@ -159,6 +162,8 @@ def exec_from_file(filename):
 
 
 if __name__ == '__main__':
+    api.__initialize__()
+
     if len(sys.argv) < 5:
         print('ERROR : Unsupported syntax, please login.\n', config.errortext)
         sys.exit()
@@ -170,8 +175,8 @@ if __name__ == '__main__':
 
     if sys.argv[2] == config.root_user and sys.argv[4] == config.root_pswd:
         api.__root = True
-    # elif IndexManager.index.exist_user(username=sys.argv[2],password=sys.argv[4]):
-    #     api.__root = False
+    elif api.check_login(sys.argv[2], sys.argv[4]):
+        api.__root = False
     else:
         print('Error : username or password is not correct.\n', config.errortext)
         sys.exit()

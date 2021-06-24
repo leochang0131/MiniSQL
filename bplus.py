@@ -188,7 +188,7 @@ class bplustree():
             self.insert_in_parent(parent, key_, new_node)
 
     def delete(self, _key):
-        print(f"{config.bcolors.BOLD}DELETE {config.bcolors.ENDC}" + "KEY: {}\n".format(_key))
+        # print(f"{config.bcolors.BOLD}DELETE {config.bcolors.ENDC}" + "KEY: {}\n".format(_key))
         l = self.find_leaf(_key)
         v = self.find_rec(l, _key)
 

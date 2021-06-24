@@ -10,19 +10,10 @@ indices = {}
 class catalog_manager():
     global tables
     global indices
+
     def __init__(self):
-        if not os.path.exists(config.catalog_path):
-            os.makedirs(config.catalog_path)
-
-            tables["sys"] = table('sys', 0)
-            indexs["sys_default_index"] = {'table':'sys', 'column':'username'}
-            columns = []
-            columns.append(column('username',True))
-            columns.append(column('password', False))
-            tables["sys"].attributes = columns
-            self.__store__()
-
-        self.__load__()
+        if os.path.exists(config.catalog_path):
+            self.__load__()
 
     def create_table(self, t_name, statement):
         # find primary key
@@ -33,10 +24,12 @@ class catalog_manager():
         # replace multiple spaces with single one 
         statement = re.sub(' +', ' ', statement).replace('\n', '')
         statement = re.sub('[()]', '', statement)
+
+        
         # getting attributes info
         atts = [x.strip().split(' ') for x in statement.split(',')]
         atts[0][:] = atts[0][2:]
-        
+        # print(atts)
         colu = []
         for attr in atts[:-1]:
             u = False
@@ -75,8 +68,13 @@ class catalog_manager():
     def drop_table(self, table):
         tables.pop(table)
 
-    def create_index(self, index_name, table, column):
-        indices[index_name] = { "table": table, "column": column }
+    def create_index(self, index_name, t_name, column):
+        col_i = tables[t_name].get_index(column)
+
+        if not tables[t_name].attributes[col_i].is_unique:
+            raise ValueError("Catalog Module : Create index failed, {} is not unique".format(column))
+
+        indices[index_name] = { "table" : t_name, "column" : col_i }
 
     def drop_index(self, index):
         indices.pop(index)
@@ -116,7 +114,10 @@ class catalog_manager():
                 tables[tab[0]] = _table
 
         with open(config.catalog_path + "indices.json", "r") as f:
-            indices = json.load(f)
+            i = json.load(f)
+            for ind in i.items():
+                indices[ind[0]] = ind[1]
+
 
     def select_check(self, _table, conditions, cols):
         # Check the attributes in SELECT clause 
@@ -166,11 +167,17 @@ class catalog_manager():
         elif _table not in tables.keys() and not t:
             raise ValueError("Catalog Module : table {} not exists".format(_table))
 
-    def exist_index(self, _index, t):
+    def exist_index(self, _index, t_name="", column="", t=False):
         # check whether the table exists, and raise error according to 't'
         # t = True: check table duplication
         # t = False: check table existence
-        global indices
+        if t:
+            col_i = tables[t_name].get_index(column) 
+
+            for ind in indices.values():
+                if col_i == ind["column"] and t_name == ind["table"]:
+                    raise ValueError("Catalog Module : duplicate create, index {} already exists".format(ind[0]))
+                
         if _index in indices.keys() and t:
             raise ValueError("Catalog Module : index {} already exists".format(_index))
         

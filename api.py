@@ -1,4 +1,6 @@
 import re
+import os
+import config
 import catalog
 import index
 import time
@@ -9,8 +11,16 @@ catalog_manager = catalog.catalog_manager()
 index_manager = index.index_manager()
 
 def show_tables():
-    for _table in catalog.tables.values():
-        print(_table)
+    for _table in catalog.tables.items():
+        print(_table[0])
+        print(_table[1])
+        print()
+
+def show_indices():
+    for _index in catalog.indices.items():
+        print(_index[0])
+        print(_index[1])
+        print()
 
 def select(args):
     time_start = time.time()
@@ -48,6 +58,7 @@ def create(args):
         start = re.search('\(', args).start()
         table = args[start_on : start].strip()
 
+        # print(table)
         catalog_manager.exist_table(table, True)
         catalog_manager.create_table(table, args)
         index_manager.create_table(table)
@@ -62,12 +73,13 @@ def create(args):
         start_on = re.search('on',args).start()
         start = re.search('\(', args).start()
         end = find_last(args, ')')
-        table = args[start_on : start].strip()
+        table = args[start_on+2 : start].strip()
         column = args[start + 1 : end].strip()
         
-        catalog_manager.exist_index(index_name, True)
+        catalog_manager.exist_table(table, False)       # table should exist
+        catalog_manager.exist_index(index_name, table, column, True)   # index should not be already created
+        index_manager.create_index(index_name, table)
         catalog_manager.create_index(index_name, table, column)
-        # IndexManager.index.create_index(index_name,table,column)
         print("Successfully create index '{}'".format(index_name))
 
     else:
@@ -92,10 +104,11 @@ def drop(args):
         
 
     elif args[0:5] == "index":
-        index = args[6:].strip()
-        catalog_manager.exist_index(index, False)
-        catalog_manager.drop_index(index)
-        print("Successfully delete index '{}'.".format(index))
+        index_n = args[6:].strip()
+        catalog_manager.exist_index(index_n, False)
+        catalog_manager.drop_index(index_n)
+        index_manager.drop_index(index_n, catalog.indices[index_n]["tables"])
+        print("Successfully delete index '{}'.".format(index_n))
 
     else:
         raise SyntaxError("API Module : Unrecoginze symbol for command 'drop',it should be 'table' or 'index'.")
@@ -114,7 +127,7 @@ def insert(args):
         raise SyntaxError("API Module : Unrecoginze symbol for command 'insert',it should be 'into'.")
 
     table = lists[1]
-    if table == "sys" and __root:
+    if table == "sys" and not __root:
         raise ValueError("ERROR : Can't modify 'sys' table, you don't have root permission.")
 
     if lists[2] != "values":
@@ -136,7 +149,7 @@ def delete(args):
         raise SyntaxError("API Module : Unrecoginze symbol for command 'delete', it should be 'from'.")
     
     table = lists[1]
-    if table == "sys" and __root:
+    if table == "sys" and not __root:
         raise ValueError("ERROR : Can't modify 'sys' table, you don't have root permission.")
 
     catalog_manager.exist_table(table, False)
@@ -152,6 +165,29 @@ def find_last(string, str):
         if position == -1:
             return last_position
         last_position = position
+
+def check_login(user, pswd):
+    return index_manager.chech_user(user, pswd)
+ 
+def __initialize__():
+    if not os.path.exists(config.catalog_path):
+        os.makedirs(config.catalog_path)
+        os.makedirs(config.index_path)
+        # create system table
+        # catalog
+        _create_sys = """table sys (user char(8) unique,
+                        pswd char(20),
+                        primary key(user)
+                        )"""
+        create(_create_sys)
+        
+        # records
+        _insert_default = "into sys values (root, 123456)"
+        insert(_insert_default)
+
+        catalog_manager.__store__()
+        catalog_manager.__load__()
+        index_manager.__store__()
 
 def __finalize__():
     catalog_manager.__finalize__()

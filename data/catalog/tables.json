@@ -1,11 +1,26 @@
 {
+  "sys": {
+    "pri_k": 0,
+    "columns": {
+      "user": [
+        true,
+        "c",
+        8
+      ],
+      "pswd": [
+        false,
+        "c",
+        20
+      ]
+    }
+  },
   "student": {
     "pri_k": 0,
     "columns": {
       "sno": [
         true,
-        "i",
-        0
+        "c",
+        8
       ],
       "sname": [
         true,

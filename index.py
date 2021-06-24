@@ -3,7 +3,7 @@ import config
 import wcwidth
 from tabulate import tabulate
 from bplus import bplustree, leaf
-from catalog import catalog_manager, tables as cat_tables, indices
+from catalog import catalog_manager, tables as cat_tables, indices as cat_indices
 
 # store the record file, with pre-created index
 ind_tables = {}
@@ -12,20 +12,36 @@ class index_manager():
     global ind_tables
 
     def __init__(self):
-        if not os.path.exists(config.index_path):
-            os.makedirs(config.index_path)
-
+        pass
+        # if not os.path.exists(config.index_path):
+        #     os.makedirs(config.index_path)
 
     def create_table(self, _table):
         ind_tables[_table] = bplustree(_table + "rec")
-        # print(ind_tables[_table])
     
     def drop_table(self, _table):
         # clear all the records
         self.delete_rec(_table)
-        # delete rec files
+        # delete rec file
         os.remove(config.index_path + _table + "rec.json")
         ind_tables.pop(_table)
+
+    def create_index(self, _index, _table):
+        # value of index would be the primary key of the table
+        ind_tables[_index] = bplustree("{}_{}".format(_index, _table))
+
+        recs = self.get_all_rec(_table)
+
+        col = cat_indices[_index]["column"]
+
+        for rec in recs:
+            ind_tables[_index].insert(rec[col], rec[int(cat_tables[_table].primary)])  
+
+
+    def drop_index(self, _index, _table):
+        # delete index file
+        os.remove(config.index_path + "{}_{}".format(_index, _table)+ ".json")
+        ind_tables.pop(_index)
 
     def insert_rec(self, _table, _values):
         self.__load__(_table)
@@ -44,7 +60,13 @@ class index_manager():
         record_tree = ind_tables[_table]
         prim_key = cat_tables[_table].primary
 
+        # insert into record file
         record_tree.insert(_values[prim_key], _values)
+
+        # insert into index file
+        for _index in cat_indices.items():
+            if _index[1]["table"] == _table:
+                ind_tables[_index[0]].insert(_values[_index[1]["column"]], _values[prim_key]) 
         
         print('Successfully insert into table {}\n'.format(_table), end='')
     
@@ -66,6 +88,10 @@ class index_manager():
             
             for rec in results:
                 ind_tables[_table].delete(rec[cat_tables[_table].primary])
+
+                for _index in cat_indices.items():
+                    if _index[1]["table"] == _table:
+                        ind_tables[_index[0]].delete(rec[_index[1]["column"]]) 
             
             print("Successfully delete {} entrys from table '{}'".format(len(results), _table))
 
@@ -84,14 +110,7 @@ class index_manager():
             results = [ val  for _leaf in leaves for val in _leaf.pt if self.check_conditions(val, cons) ]
         # there is no condition
         else: 
-            first_leaf = ind_tables[_table].root
-            while type(first_leaf) is not leaf:
-                first_leaf = first_leaf.pt[0]
-            while first_leaf != "none":
-                for rec in first_leaf.pt:
-                    results.append(rec)
-                
-                first_leaf = first_leaf.nt
+            results = self.get_all_rec(_table)
         
         # PROJECT
         # print(cat_tables)
@@ -103,36 +122,41 @@ class index_manager():
             att_index = [att_info.index(i) for i in att_names]
 
             # project the wanted attributes of records
-            results = [ [att for i, att in enumerate(rec) if i in att_index ] for rec in results]
+            results = [ [ att for i, att in enumerate(rec) if i in att_index ] for rec in results]
         
         print(tabulate(results, headers=att_names, tablefmt='fancy_grid'))
         print("\n {} records selected".format(len(results)))
 
-    def check_conditions(self, _values, conditions):
-        # check given records satisfy passed in conditions
-        for con in conditions:
-            _value = _values[con[0]]
-            if con[1] == '<':
-                if not (_value < con[2]):
-                    return False
-            elif con[1] == '<=':
-                if not (_value <= con[2]):
-                    return False
-            elif con[1] == '>':
-                if not (_value > con[2]):
-                    return False
-            elif con[1] == '>=':
-                if not (_value >= con[2]):
-                    return False
-            elif con[1] == '<>':
-                if not (_value != con[2]):
-                    return False
-            elif con[1] == '=':
-                if not (_value == con[2]):
-                    return False
-            else:
-                raise SyntaxError(config.index_where_fail)
-        return True
+    def chech_user(self, user, pswd):
+        self.__load__("sys")
+        cons = [(0 , '=', user), (1, '=', pswd)]
+        leaves = self.find_leaf_condition("sys", cons[0]) 
+        
+        results = [ val  for _leaf in leaves for val in _leaf.pt if self.check_conditions(val, cons) ]
+
+        return True if len(results) != 0 else False
+
+
+    def __load_i__(self, t_name):
+    # load index
+    for _index in cat_indices.items():
+        if _index[1]["table"] == t_name:
+            ind_tree = bplustree("{}_{}".format(_index[0], t_name))
+            bplustree.__load__("{}_{}".format(_index[0], t_name), ind_tree)
+            ind_tables[_index[0]] = ind_tree
+
+    def __load__(self, t_name):
+        if t_name not in ind_tables.keys():
+            # load table rec
+            print("Loading Table", t_name)
+            tree = bplustree(t_name + "rec")
+            bplustree.__load__(t_name + "rec", tree)
+            ind_tables[t_name] = tree
+
+            
+    def __store__(self):
+        for _table in ind_tables.values():
+            _table.__store__()
 
     def convert_conditions(self, _table, conditions):
         # parameters: "a = 8 and b = c and a <> c" 
@@ -232,9 +256,32 @@ class index_manager():
                 first_leaf = first_leaf.nt
         return nodes
 
-    def __store__(self):
-        for _table in ind_tables.values():
-            _table.__store__()
+    def check_conditions(self, _values, conditions):
+        # check each records in the given leaves with conditions
+        # return the list of satisfied records
+        for con in conditions:
+            _value = _values[con[0]]
+            if con[1] == '<':
+                if not (_value < con[2]):
+                    return False
+            elif con[1] == '<=':
+                if not (_value <= con[2]):
+                    return False
+            elif con[1] == '>':
+                if not (_value > con[2]):
+                    return False
+            elif con[1] == '>=':
+                if not (_value >= con[2]):
+                    return False
+            elif con[1] == '<>':
+                if not (_value != con[2]):
+                    return False
+            elif con[1] == '=':
+                if not (_value == con[2]):
+                    return False
+            else:
+                raise SyntaxError(config.index_where_fail)
+        return True
 
     def check_unique(self, _table, column, value):
         att = cat_tables[_table].attributes
@@ -242,13 +289,21 @@ class index_manager():
         n = self.find_leaf_condition(_table, [column, '=', value])
         if len(n):
             raise ValueError("Index Module : column '{}' does not satisfy unique constrains.".format(att[column].name))
-                                
-    def __load__(self, t_name):
-        if t_name not in ind_tables.keys():
-            print("Loading Table", t_name)
-            tree = bplustree(t_name + "rec")
-            bplustree.__load__(t_name + "rec", tree)
-            ind_tables[t_name] = tree
+
+    def get_all_rec(self, _table):
+        self.__load__(_table)
+
+        first_leaf = ind_tables[_table].root
+        results = []
+        while type(first_leaf) is not leaf:
+            first_leaf = first_leaf.pt[0]
+        while first_leaf != "none":
+            for rec in first_leaf.pt:
+                results.append(rec)
+            
+            first_leaf = first_leaf.nt
+        
+        return results
 
     def __finalize__(self):
         self.__store__()

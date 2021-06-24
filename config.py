@@ -31,9 +31,7 @@ index_path = root + "index/"
 # System
 root_user = "root"
 root_pswd = "123456"
-default_user = "ZLQ"
-default_pswd = "123456"
-prompt = "> "
+prompt = "### "
 
 # Index
 index_where_fail = "Index Module : unsupported op."
