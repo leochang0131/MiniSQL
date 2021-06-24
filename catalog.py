@@ -1,7 +1,6 @@
 import re
 import os
 import json
-import bplus
 import config
 from basic_class import table, column
 
@@ -9,8 +8,9 @@ tables = {}
 indices = {}
 
 class catalog_manager():
-
-    def __initialize__(self):
+    global tables
+    global indices
+    def __init__(self):
         if not os.path.exists(config.catalog_path):
             os.makedirs(config.catalog_path)
 
@@ -20,23 +20,22 @@ class catalog_manager():
             columns.append(column('username',True))
             columns.append(column('password', False))
             tables["sys"].attributes = columns
-            __store__()
+            self.__store__()
 
-        __load__()
+        self.__load__()
 
-    def create_table(self, statement):
+    def create_table(self, t_name, statement):
         # find primary key
         pri_st = re.search('primary key *\(',statement).end()
         pri_ed = re.search('\)',statement[pri_st:]).start()
         primary_key = statement[pri_st:][:pri_ed].strip()
 
         # replace multiple spaces with single one 
-        statement = re.sub(' +', ' ', statement)
-
+        statement = re.sub(' +', ' ', statement).replace('\n', '')
+        statement = re.sub('[()]', '', statement)
         # getting attributes info
         atts = [x.strip().split(' ') for x in statement.split(',')]
-        t_name = atts[0][2]
-        atts[0][:] = atts[0][4:]
+        atts[0][:] = atts[0][2:]
         
         colu = []
         for attr in atts[:-1]:
@@ -45,7 +44,7 @@ class catalog_manager():
             length = 0
             d_type = 'c'
 
-            if "unique" in attr:
+            if "unique" in attr or primary_key in attr:
                 u = True
 
             if "int" in attr[1]:
@@ -54,7 +53,7 @@ class catalog_manager():
                 d_type = 'f'
             elif "char"  in attr[1]:
                 d_type = 'c'
-                length = int(attr[1][5:-1])
+                length = int(attr[1][4:])
             else:
                 raise NameError("Catalog Module : Unknow datatype ", attr[1])
             
@@ -71,6 +70,7 @@ class catalog_manager():
         else:
             global tables
             tables[t_name] = table(t_name, colu, primary)
+            # print(tables)
 
     def drop_table(self, table):
         tables.pop(table)
@@ -102,6 +102,7 @@ class catalog_manager():
 
     @staticmethod
     def __load__():
+        
         with open(config.catalog_path + "tables.json", "r") as f:
             t = json.load(f)
             for tab in t.items():
@@ -115,7 +116,6 @@ class catalog_manager():
                 tables[tab[0]] = _table
 
         with open(config.catalog_path + "indices.json", "r") as f:
-            global indices
             indices = json.load(f)
 
     def select_check(self, _table, conditions, cols):
@@ -153,7 +153,7 @@ class catalog_manager():
                     
                 else: value = values[i]
                     
-                IndexManager.index.check_unique(_table, i, value)
+                # api.index_manager.check_unique(_table, i, value)
 
     def exist_table(self, _table, t):
         # check whether the table exists, and raise error according to 't'
@@ -177,23 +177,18 @@ class catalog_manager():
         elif _index not in indices.keys() and not t:
             raise ValueError("Catalog Module : index {} not exists".format(_index))
 
+    def __finalize__(self):
+        self.__store__()
 
+if "__name__" == "__main__":
+    statement = "table student (\
+                sno char(8),\
+                sname char(16) unique,\
+                sage int,\
+                sgender char(1),\
+                primary key(sno)\
+                );"
 
-
-statement = "create table student (\
-             sno char(8),\
-             sname char(16) unique,\
-             sage int,\
-             sgender char(1),\
-             primary key(sno)\
-            );"
-
-
-a = catalog_manager()
-# a.create_table(statement)
-# a.create_index("student_test", "student", "primary")
-a.__load__()
-
-
-
-# a.__store__()
+    a = catalog_manager()
+    a.create_table(statement)   
+    print(tables)

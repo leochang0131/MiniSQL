@@ -3,9 +3,9 @@
     "pri_k": 0,
     "columns": {
       "sno": [
-        false,
-        "c",
-        8
+        true,
+        "i",
+        0
       ],
       "sname": [
         true,

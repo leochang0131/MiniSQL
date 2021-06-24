@@ -7,8 +7,12 @@ class table():
         self.primary = primary
         self.attributes = attributes
     
+    def get_index(self, a_name):
+        # return the index of attributes
+        return [i for i, att in enumerate(self.attributes) if a_name == att.name][0]
+
     def __repr__(self):
-        return "table_name: {}\n attributes:{}\n primary:{}".format(self.name, self.attributes, self.primary)
+        return "table_name: {}\nprimary: {}\nattributes:{}\n-----".format(self.name, self.primary, self.attributes)
 
 class column():
     def __init__(self, name, is_unique, d_type = 'c', length = 20):

@@ -24,6 +24,10 @@ class leaf(node):
     
         super().__init__(keys, pt, pr, nt)
         # pt now points to value
+    def __repr__(self):
+        
+        
+        return "{}, {}".format(self.keys, self.pt)
 
 class bplustree():
     def __init__(self, name, depth=0, max_degree=config.max_degree, min_degree=config.max_degree//2):
@@ -107,14 +111,14 @@ class bplustree():
         return len(_node.pt)-1
 
     def insert(self, _key, value):
-        print(f"{config.bcolors.BOLD}INSERT {config.bcolors.ENDC}" + "KEY: {}, VAL: {} \n".format(_key, value))
+        # print(f"{config.bcolors.BOLD}INSERT {config.bcolors.ENDC}" + "KEY: {}, VAL: {} \n".format(_key, value))
 
         l = self.find_leaf(_key)
 
         # check duplicate 
         if self.find_rec(l, _key)[0]:
-            print("key already exists")
-            return 
+            raise ValueError("BplusTree: Index Key duplicated ", _key)
+            
 
         self.insert_in_leaf(l, _key, value)
 
@@ -405,7 +409,8 @@ class bplustree():
                 lvl = bplus_info[-1]+1
                 bplus_info.append(i+1) 
 
-        nodes[-2].nt = nodes[-1]
+        if len(nodes) > 2:
+            nodes[-2].nt = nodes[-1]
         nodes[-1].nt = "none"
 
         # assign pointers for internal nodes
